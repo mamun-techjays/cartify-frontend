@@ -127,16 +127,7 @@ class ApiService {
           "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80",
         cta_text: "Learn More",
         cta_link: "/products",
-      },
-      {
-        id: "4",
-        title: "Electronics Sale",
-        description: "Latest gadgets at unbeatable prices",
-        image:
-          "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2126&q=80",
-        cta_text: "Shop Electronics",
-        cta_link: "/products",
-      },
+      }
     ]
 
     return Promise.resolve({

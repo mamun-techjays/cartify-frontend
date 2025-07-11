@@ -5,7 +5,7 @@ import CategorySection from "@/components/category-section"
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen">
+    <div className="flex flex-col bg-gray-50">
       <Suspense fallback={<div className="h-96 bg-gray-100 animate-pulse rounded-2xl mx-4 mt-4" />}>
         <HeroBanner />
       </Suspense>

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { apiService } from "@/services/api"
 import Link from "next/link"
+import { getBannerImageUrl } from "@/utils/image-utils"
 
 interface Banner {
   id: string
@@ -25,11 +26,16 @@ export default function HeroBanner() {
     const fetchBanners = async () => {
       try {
         setLoading(true)
-        const response = await apiService.get("/banners")
+        const response = await apiService.get("/api/banners")
         const bannersData = response.data || []
 
         if (Array.isArray(bannersData) && bannersData.length > 0) {
-          setBanners(bannersData)
+          // Process banner images to ensure correct URLs
+          const processedBanners = bannersData.map(banner => ({
+            ...banner,
+            image: getBannerImageUrl(banner)
+          }))
+          setBanners(processedBanners)
         } else {
           // Use fallback banners if API returns empty or invalid data
           setBanners([
@@ -38,7 +44,7 @@ export default function HeroBanner() {
               title: "Summer Sale 2024",
               description: "Up to 70% off on selected items",
               image:
-                "https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+                "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=2070&h=800&fit=crop",
               cta_text: "Shop Now",
               cta_link: "/products",
             },
@@ -47,7 +53,7 @@ export default function HeroBanner() {
               title: "New Arrivals",
               description: "Discover the latest trends and styles",
               image:
-                "https://images.unsplash.com/photo-1472851294608-062f824d29cc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+                "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=2070&h=800&fit=crop",
               cta_text: "Explore",
               cta_link: "/products",
             },
@@ -56,17 +62,8 @@ export default function HeroBanner() {
               title: "Free Shipping",
               description: "On orders over $50 - Limited time offer",
               image:
-                "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80",
+                "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=2340&h=800&fit=crop",
               cta_text: "Learn More",
-              cta_link: "/products",
-            },
-            {
-              id: "4",
-              title: "Electronics Sale",
-              description: "Latest gadgets at unbeatable prices",
-              image:
-                "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2126&q=80",
-              cta_text: "Shop Electronics",
               cta_link: "/products",
             },
           ])
@@ -83,16 +80,16 @@ export default function HeroBanner() {
             title: "Welcome to Cartify",
             description: "Your one-stop shop for quality products",
             image:
-              "https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+              "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=2070&h=800&fit=crop",
             cta_text: "Start Shopping",
             cta_link: "/products",
           },
           {
             id: "2",
             title: "Quality Products",
-            description: "Discover amazing deals on premium items",
+            description: "Discover amazing products at great prices",
             image:
-              "https://images.unsplash.com/photo-1472851294608-062f824d29cc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+              "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=2070&h=800&fit=crop",
             cta_text: "Browse Now",
             cta_link: "/products",
           },

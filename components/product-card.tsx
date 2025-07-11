@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { useCart } from "@/contexts/cart-context"
 import { useWishlist } from "@/contexts/wishlist-context"
 import { useToast } from "@/hooks/use-toast"
+import { getProductImageUrl } from "@/utils/image-utils"
 
 interface Product {
   id: number
@@ -29,12 +30,15 @@ interface ProductCardProps {
 
 // Function to get a real product image based on product name/category
 const getProductImage = (product: Product): string => {
+  // First, try to normalize the product's image URL
+  const normalizedImage = getProductImageUrl(product)
+  
   if (
-    product.image &&
-    product.image !== "/placeholder.svg?height=250&width=250" &&
-    !product.image.includes("placeholder")
+    normalizedImage &&
+    normalizedImage !== "/placeholder.svg?height=250&width=250" &&
+    !normalizedImage.includes("placeholder")
   ) {
-    return product.image
+    return normalizedImage
   }
 
   // Real product images based on product name or category
@@ -136,7 +140,7 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
     ))
   }
 
-  const productImage = imageError ? getProductImage(product) : product.image || getProductImage(product)
+  const productImage = imageError ? getProductImage(product) : getProductImageUrl(product) || getProductImage(product)
 
   if (viewMode === "list") {
     return (
@@ -162,7 +166,8 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
                 <h3 className="font-semibold text-lg mb-2 text-gray-900 hover:text-primary transition-colors">
                   {product.name}
                 </h3>
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>
+                <p className="text-gray-600 text-sm mb-3 line-clamp-2" 
+                   dangerouslySetInnerHTML={{ __html: product.description }} />
                 {product.rating && (
                   <div className="flex items-center mb-2">
                     <div className="flex mr-2">{renderStars(Math.floor(product.rating))}</div>
@@ -252,7 +257,8 @@ export default function ProductCard({ product, viewMode = "grid" }: ProductCardP
           <h3 className="font-semibold text-lg mb-2 line-clamp-2 text-gray-900 group-hover:text-primary transition-colors">
             {product.name}
           </h3>
-          <p className="text-gray-600 text-sm mb-3 line-clamp-2 leading-relaxed">{product.description}</p>
+          <p className="text-gray-600 text-sm mb-3 line-clamp-2 leading-relaxed" 
+             dangerouslySetInnerHTML={{ __html: product.description }} />
 
           {product.rating && (
             <div className="flex items-center mb-3">

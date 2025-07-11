@@ -13,7 +13,8 @@ import { useAuth } from "@/contexts/auth-context"
 import { useToast } from "@/hooks/use-toast"
 
 export default function RegisterPage() {
-  const [name, setName] = useState("")
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -30,7 +31,7 @@ export default function RegisterPage() {
     e.preventDefault()
 
     // Validation
-    if (!name || !email || !password || !confirmPassword) {
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields.",
@@ -60,7 +61,7 @@ export default function RegisterPage() {
     setLoading(true)
 
     try {
-      await register(name, email, password)
+      await register(firstName, lastName, email, password)
 
       // Check if we're in offline mode based on the response
       const token = localStorage.getItem("auth_token")
@@ -123,17 +124,35 @@ export default function RegisterPage() {
           {/* Registration Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="name" className="text-sm font-medium text-gray-700 mb-1 block">
-                Full Name
+              <Label htmlFor="firstName" className="text-sm font-medium text-gray-700 mb-1 block">
+                First Name
               </Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
-                  id="name"
+                  id="firstName"
                   type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter your full name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="Enter your first name"
+                  className="pl-9 h-10 rounded-xl border-gray-200 focus:border-primary focus:ring-primary/20"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="lastName" className="text-sm font-medium text-gray-700 mb-1 block">
+                Last Name
+              </Label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  id="lastName"
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  placeholder="Enter your last name"
                   className="pl-9 h-10 rounded-xl border-gray-200 focus:border-primary focus:ring-primary/20"
                   required
                 />

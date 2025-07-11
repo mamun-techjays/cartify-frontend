@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { apiService } from "@/services/api"
+import { getCategoryImageUrl } from "@/utils/image-utils"
 
 interface Category {
   id: number
@@ -29,7 +30,17 @@ export default function CategoriesPage() {
     const fetchCategories = async () => {
       try {
         const response = await apiService.get<Category[]>("/api/categories")
-        setCategories(response.data || [])
+        const categoriesData = response.data || []
+        
+        // Process category images to ensure correct URLs
+        const processedCategories = Array.isArray(categoriesData)
+          ? categoriesData.map((category: any) => ({
+              ...category,
+              image: getCategoryImageUrl(category)
+            }))
+          : []
+        
+        setCategories(processedCategories)
       } catch (error) {
         console.error("Failed to fetch categories:", error)
         setCategories([])

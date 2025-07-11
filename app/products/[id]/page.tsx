@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
-import { Star, ShoppingCart, Heart, Truck, Shield, RotateCcw } from "lucide-react"
+import { Star, ShoppingCart, Heart, Truck, Shield, RotateCcw, Eye, ThumbsUp, MessageCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useCart } from "@/contexts/cart-context"
 import { useToast } from "@/hooks/use-toast"
 import { apiService } from "@/services/api"
+import { getProductImageUrl } from "@/utils/image-utils"
+import Link from "next/link"
 
 interface Product {
   id: number
@@ -24,6 +26,101 @@ interface Product {
   updated_at?: string
 }
 
+interface Review {
+  id: number
+  user_name: string
+  rating: number
+  title: string
+  comment: string
+  date: string
+  helpful_count: number
+  verified: boolean
+}
+
+const mockReviews: Review[] = [
+  {
+    id: 1,
+    user_name: "Sarah Johnson",
+    rating: 5,
+    title: "Excellent quality and fast delivery!",
+    comment: "I'm really impressed with this product. The quality is outstanding and it arrived much faster than expected. Highly recommend!",
+    date: "2024-01-15",
+    helpful_count: 24,
+    verified: true,
+  },
+  {
+    id: 2,
+    user_name: "Mike Chen",
+    rating: 4,
+    title: "Great value for money",
+    comment: "Good product overall. The only minor issue is the packaging could be better, but the product itself works perfectly.",
+    date: "2024-01-12",
+    helpful_count: 18,
+    verified: true,
+  },
+  {
+    id: 3,
+    user_name: "Emily Rodriguez",
+    rating: 5,
+    title: "Exceeded my expectations",
+    comment: "This product is even better than I expected. The features are amazing and the customer service was top-notch.",
+    date: "2024-01-10",
+    helpful_count: 31,
+    verified: false,
+  },
+  {
+    id: 4,
+    user_name: "David Thompson",
+    rating: 3,
+    title: "Good but could be better",
+    comment: "The product is decent but I think it's a bit overpriced for what you get. It works well though.",
+    date: "2024-01-08",
+    helpful_count: 12,
+    verified: true,
+  },
+  {
+    id: 5,
+    user_name: "Lisa Wang",
+    rating: 5,
+    title: "Perfect for my needs",
+    comment: "Exactly what I was looking for. The quality is excellent and it's very easy to use. Will definitely buy again!",
+    date: "2024-01-05",
+    helpful_count: 27,
+    verified: true,
+  },
+]
+
+const recentlyViewedProducts = [
+  {
+    id: 2,
+    name: "Smart Fitness Watch",
+    price: 199.99,
+    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop",
+    rating: 4.8,
+  },
+  {
+    id: 3,
+    name: "Premium Running Shoes",
+    price: 129.99,
+    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop",
+    rating: 4.6,
+  },
+  {
+    id: 4,
+    name: "Designer Coffee Maker",
+    price: 149.99,
+    image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=400&fit=crop",
+    rating: 4.4,
+  },
+  {
+    id: 5,
+    name: "Travel Laptop Backpack",
+    price: 79.99,
+    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop",
+    rating: 4.7,
+  },
+]
+
 export default function ProductDetailPage() {
   const params = useParams()
   const [product, setProduct] = useState<Product | null>(null)
@@ -31,6 +128,7 @@ export default function ProductDetailPage() {
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const [isLiked, setIsLiked] = useState(false)
+  const [showAllReviews, setShowAllReviews] = useState(false)
 
   const { addItem } = useCart()
   const { toast } = useToast()
@@ -61,7 +159,7 @@ export default function ProductDetailPage() {
       id: product.id,
       name: product.name,
       price: product.price,
-      image: product.image,
+      image: getProductImageUrl(product),
       quantity,
     })
 
@@ -76,6 +174,8 @@ export default function ProductDetailPage() {
       <Star key={i} className={`h-5 w-5 ${i < rating ? "text-yellow-400 fill-current" : "text-gray-300"}`} />
     ))
   }
+
+  const displayedReviews = showAllReviews ? mockReviews : mockReviews.slice(0, 3)
 
   if (loading) {
     return (
@@ -113,7 +213,7 @@ export default function ProductDetailPage() {
     )
   }
 
-  const images = product.images || [product.image]
+  const images = product.images || [getProductImageUrl(product)]
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -189,7 +289,8 @@ export default function ProductDetailPage() {
             )}
           </div>
 
-          <p className="text-gray-600 leading-relaxed text-lg">{product.description}</p>
+          <p className="text-gray-600 leading-relaxed text-lg" 
+             dangerouslySetInnerHTML={{ __html: product.description }} />
 
           {/* Stock Status */}
           {product.stock !== undefined && (
@@ -257,6 +358,113 @@ export default function ProductDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Recently Viewed Products Section */}
+      <section className="mt-16 py-12 border-t border-gray-200">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+            <Eye className="h-6 w-6 mr-2 text-primary" />
+            Recently Viewed
+          </h2>
+          <Link href="/products" className="text-primary hover:text-primary/80 font-medium">
+            View All Products
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {recentlyViewedProducts.map((item) => (
+            <Link key={item.id} href={`/products/${item.id}`} className="group">
+              <div className="bg-white rounded-2xl shadow-soft overflow-hidden border border-gray-100 hover:shadow-medium transition-shadow">
+                <div className="relative">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-200"
+                  />
+                  <button className="absolute top-3 right-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Heart className="h-4 w-4 text-gray-600" />
+                  </button>
+                </div>
+                <div className="p-4">
+                  <h3 className="font-medium text-gray-900 group-hover:text-primary transition-colors line-clamp-2 mb-2">
+                    {item.name}
+                  </h3>
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-bold text-primary">${item.price.toFixed(2)}</span>
+                    <div className="flex items-center">
+                      <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                      <span className="text-sm text-gray-600 ml-1">{item.rating}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Reviews Section */}
+      <section className="mt-16 py-12 border-t border-gray-200">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+            <MessageCircle className="h-6 w-6 mr-2 text-primary" />
+            Customer Reviews
+          </h2>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center">
+              <div className="flex mr-2">{renderStars(4.5)}</div>
+              <span className="text-gray-600 font-medium">4.5 out of 5</span>
+            </div>
+            <span className="text-gray-400">•</span>
+            <span className="text-gray-600">{mockReviews.length} reviews</span>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          {displayedReviews.map((review) => (
+            <div key={review.id} className="bg-white rounded-2xl p-6 shadow-soft border border-gray-100">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <div className="flex items-center space-x-2 mb-2">
+                    <h4 className="font-semibold text-gray-900">{review.user_name}</h4>
+                    {review.verified && (
+                      <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium">
+                        Verified Purchase
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="flex">{renderStars(review.rating)}</div>
+                    <span className="text-gray-600 text-sm">{review.title}</span>
+                  </div>
+                </div>
+                <span className="text-gray-500 text-sm">{new Date(review.date).toLocaleDateString()}</span>
+              </div>
+              <p className="text-gray-700 leading-relaxed mb-4">{review.comment}</p>
+              <div className="flex items-center space-x-4">
+                <button className="flex items-center space-x-1 text-gray-500 hover:text-primary transition-colors">
+                  <ThumbsUp className="h-4 w-4" />
+                  <span className="text-sm">Helpful ({review.helpful_count})</span>
+                </button>
+                <button className="text-gray-500 hover:text-primary transition-colors text-sm">
+                  Reply
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {mockReviews.length > 3 && (
+          <div className="text-center mt-8">
+            <Button
+              onClick={() => setShowAllReviews(!showAllReviews)}
+              variant="outline"
+              className="px-8 py-3 rounded-xl font-medium hover:bg-primary hover:text-white transition-all duration-200"
+            >
+              {showAllReviews ? "Show Less Reviews" : "Show All Reviews"}
+            </Button>
+          </div>
+        )}
+      </section>
     </div>
   )
 }

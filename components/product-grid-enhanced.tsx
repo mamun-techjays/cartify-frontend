@@ -1,11 +1,20 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
-import ProductCard from "./product-card"
+import { useState, useEffect, useMemo, useCallback, Suspense } from "react"
+import dynamic from "next/dynamic"
+import { useSearchParams } from "next/navigation"
+import { apiService } from "@/services/api"
+import { getProductImageUrl } from "@/utils/image-utils"
 import ProductFilters from "./product-filters"
+import LoadingSkeleton from "./loading-skeleton"
 import { Button } from "@/components/ui/button"
 import { Grid, List, Filter } from "lucide-react"
-import { apiService } from "@/services/api"
+
+// Dynamically import heavy components for better performance
+const ProductCard = dynamic(() => import("./product-card"), {
+  loading: () => <LoadingSkeleton />,
+  ssr: false,
+})
 
 interface Product {
   id: number

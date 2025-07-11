@@ -9,10 +9,15 @@ interface User {
   email: string
 }
 
+interface AuthResponse {
+  token: string
+  user: User
+}
+
 interface AuthContextType {
   user: User | null
   login: (email: string, password: string) => Promise<void>
-  register: (name: string, email: string, password: string) => Promise<void>
+  register: (firstName: string, lastName: string, email: string, password: string) => Promise<void>
   logout: () => Promise<void>
   loading: boolean
   isAuthenticated: boolean
@@ -46,7 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchProfile = async () => {
     try {
-      const response = await apiService.get("/api/auth/profile")
+      const response = await apiService.get<User>("/api/auth/profile")
       setUser(response.data)
     } catch (error) {
       console.warn("Failed to fetch profile:", error)
@@ -57,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string) => {
     try {
       setLoading(true)
-      const response = await apiService.post("/api/auth/login", {
+      const response = await apiService.post<AuthResponse>("/api/auth/login", {
         email,
         password,
       })
@@ -84,11 +89,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const register = async (name: string, email: string, password: string) => {
+  const register = async (firstName: string, lastName: string, email: string, password: string) => {
     try {
       setLoading(true)
-      const response = await apiService.post("/api/auth/register", {
-        name,
+      const response = await apiService.post<AuthResponse>("/api/auth/register", {
+        first_name: firstName,
+        last_name: lastName,
         email,
         password,
       })
