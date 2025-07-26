@@ -27,7 +27,11 @@ export default function HeroBanner() {
       try {
         setLoading(true)
         const response = await apiService.get("/api/banners")
-        const bannersData = response.data || []
+        console.log("Banner API response:", response) // Debug log
+        
+        // Check if response has data property (API service wrapper)
+        const bannersData = (response.data as any)?.data || response.data || []
+        console.log("Banners data:", bannersData) // Debug log
 
         if (Array.isArray(bannersData) && bannersData.length > 0) {
           // Process banner images to ensure correct URLs
@@ -35,8 +39,10 @@ export default function HeroBanner() {
             ...banner,
             image: getBannerImageUrl(banner)
           }))
+          console.log("Processed banners:", processedBanners) // Debug log
           setBanners(processedBanners)
         } else {
+          console.warn("API returned empty or invalid banner data, using fallback")
           // Use fallback banners if API returns empty or invalid data
           setBanners([
             {
@@ -44,7 +50,7 @@ export default function HeroBanner() {
               title: "Summer Sale 2024",
               description: "Up to 70% off on selected items",
               image:
-                "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=2070&h=800&fit=crop",
+                "http://34.102.83.157/assets/images/Banners/banner1.webp",
               cta_text: "Shop Now",
               cta_link: "/products",
             },
@@ -53,7 +59,7 @@ export default function HeroBanner() {
               title: "New Arrivals",
               description: "Discover the latest trends and styles",
               image:
-                "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=2070&h=800&fit=crop",
+                "http://34.102.83.157/assets/images/Banners/banner2.webp",
               cta_text: "Explore",
               cta_link: "/products",
             },
@@ -62,7 +68,7 @@ export default function HeroBanner() {
               title: "Free Shipping",
               description: "On orders over $50 - Limited time offer",
               image:
-                "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=2340&h=800&fit=crop",
+                "http://34.102.83.157/assets/images/Banners/banner3.webp",
               cta_text: "Learn More",
               cta_link: "/products",
             },
@@ -70,17 +76,17 @@ export default function HeroBanner() {
         }
         setError(null)
       } catch (error) {
-        console.warn("Failed to fetch banners, using fallback:", error)
-        setError(null) // Don't show error to user, just use fallback
+        console.error("Failed to fetch banners:", error)
+        setError(error as Error)
 
-        // Always provide fallback banners on error
+        // Only use fallback on actual errors, not empty responses
         setBanners([
           {
             id: "1",
             title: "Welcome to Cartify",
             description: "Your one-stop shop for quality products",
             image:
-              "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=2070&h=800&fit=crop",
+              "http://34.102.83.157/assets/images/Banners/banner1.webp",
             cta_text: "Start Shopping",
             cta_link: "/products",
           },
@@ -89,7 +95,7 @@ export default function HeroBanner() {
             title: "Quality Products",
             description: "Discover amazing products at great prices",
             image:
-              "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=2070&h=800&fit=crop",
+              "http://34.102.83.157/assets/images/Banners/banner2.webp",
             cta_text: "Browse Now",
             cta_link: "/products",
           },
@@ -119,9 +125,31 @@ export default function HeroBanner() {
     setCurrentSlide((prev) => (prev - 1 + banners.length) % banners.length)
   }
 
-  // Remove the error display section since we always show fallback banners
   if (loading) {
     return <div className="h-96 bg-gray-100 animate-pulse rounded-2xl mx-4 mt-6" />
+  }
+
+  if (error) {
+    console.error("Banner error:", error)
+    return (
+      <section className="relative h-96 md:h-[500px] overflow-hidden rounded-2xl mx-4 mt-6 shadow-medium bg-gradient-to-r from-red-500 to-red-600">
+        <div className="relative z-10 h-full flex items-center justify-center text-center text-white">
+          <div className="max-w-4xl mx-auto px-4">
+            <h1 className="text-4xl md:text-6xl font-display font-bold mb-4 drop-shadow-lg">Banner Error</h1>
+            <p className="text-xl md:text-2xl mb-8 drop-shadow-md font-medium">Failed to load banners</p>
+            <p className="text-lg mb-8 drop-shadow-md">{error.message}</p>
+            <Link href="/products">
+              <Button
+                size="lg"
+                className="bg-white text-red-600 hover:bg-gray-100 rounded-xl font-semibold px-8 py-4 text-lg shadow-lg"
+              >
+                Continue Shopping
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+    )
   }
 
   if (banners.length === 0) {
