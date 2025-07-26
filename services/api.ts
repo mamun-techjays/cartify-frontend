@@ -9,7 +9,7 @@ class ApiService {
   private authToken: string | null = null
 
   constructor() {
-    this.baseURL = process.env.NEXT_PUBLIC_API_URL || "http://34.131.155.11"
+    this.baseURL = process.env.NEXT_PUBLIC_API_URL || "http://34.102.83.157"
   }
 
   setAuthToken(token: string | null) {

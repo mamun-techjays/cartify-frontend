@@ -12,19 +12,19 @@ export function getProductImageUrl(product: any): string {
 
   // If the image is a relative path starting with /assets, construct the full URL
   if (product.image.startsWith('/assets/')) {
-    const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://34.131.155.11"
+    const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://34.102.83.157"
     return `${baseURL}${product.image}`
   }
 
   // If the image is just a filename or path, construct the full URL
   if (product.image.includes('Products/') || product.image.includes('products/')) {
-    const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://34.131.155.11"
+    const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://34.102.83.157"
     return `${baseURL}/assets/images/${product.image}`
   }
 
   // If it's just a number or simple filename, construct the full URL
   if (/^\d+\.(jpg|jpeg|png|gif|webp)$/i.test(product.image)) {
-    const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://34.131.155.11"
+    const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://34.102.83.157"
     return `${baseURL}/assets/images/Products/${product.image}`
   }
 
@@ -44,13 +44,13 @@ export function getBannerImageUrl(banner: any): string {
 
   // If the image is a relative path starting with /assets, construct the full URL
   if (banner.image.startsWith('/assets/')) {
-    const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://34.131.155.11"
+    const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://34.102.83.157"
     return `${baseURL}${banner.image}`
   }
 
   // If it's just a filename, construct the full URL
   if (/^[^\/]+\.(jpg|jpeg|png|gif|webp)$/i.test(banner.image)) {
-    const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://34.131.155.11"
+    const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://34.102.83.157"
     return `${baseURL}/assets/images/Banners/${banner.image}`
   }
 
@@ -70,13 +70,13 @@ export function getCategoryImageUrl(category: any): string {
 
   // If the image is a relative path starting with /assets, construct the full URL
   if (category.image.startsWith('/assets/')) {
-    const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://34.131.155.11"
+    const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://34.102.83.157"
     return `${baseURL}${category.image}`
   }
 
   // If it's just a filename, construct the full URL
   if (/^[^\/]+\.(jpg|jpeg|png|gif|webp)$/i.test(category.image)) {
-    const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://34.131.155.11"
+    const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://34.102.83.157"
     return `${baseURL}/assets/images/Categories/${category.image}`
   }
 
