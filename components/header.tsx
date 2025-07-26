@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useEffect, useMemo, useCallback } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Search, ShoppingCart, Heart, Menu, X, Bell, ChevronDown, Grid, Tag } from "lucide-react"
+import { Search, ShoppingCart, Heart, Menu, X, Bell, ChevronDown, Grid, Tag, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -83,6 +83,53 @@ export default function Header() {
       })
     }
   }, [logout, toast, router])
+
+  const handleDownloadReport = useCallback(async () => {
+    try {
+      toast({
+        title: "Downloading report...",
+        description: "Please wait while we generate your report.",
+      })
+
+      const response = await fetch('http://34.102.83.157/api/statistics/download', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      // Get the blob from the response
+      const blob = await response.blob()
+      
+      // Create a download link
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'cartify-statistics-report.csv'
+      document.body.appendChild(a)
+      a.click()
+      
+      // Clean up
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+
+      toast({
+        title: "Report downloaded successfully!",
+        description: "Your statistics report has been downloaded.",
+      })
+    } catch (error) {
+      console.error('Error downloading report:', error)
+      toast({
+        title: "Download failed",
+        description: "There was an error downloading the report. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }, [toast])
 
   const toggleMenu = useCallback(() => setIsMenuOpen(prev => !prev), [])
   const toggleSearch = useCallback(() => setShowSearch(prev => !prev), [])
@@ -218,49 +265,36 @@ export default function Header() {
               </button>
 
               {isAuthenticated ? (
-                <div className="relative group">
-                  <Link
-                    href="/profile"
-                    className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                <div className="flex items-center space-x-4">
+                  <Button
+                    onClick={handleDownloadReport}
+                    variant="outline"
+                    size="sm"
+                    className="rounded-xl border-gray-300 hover:bg-gray-50 transition-all"
                   >
-                    <UserAvatar name={user?.name || "User"} email={user?.email} size="md" />
-                  </Link>
-
-                  <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                    <div className="p-3 border-b border-gray-100">
-                      <p className="font-medium text-gray-900">{user?.name}</p>
-                      <p className="text-sm text-gray-500">{user?.email}</p>
-                    </div>
-                    <div className="py-2">
-                      <Link
-                        href="/profile"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                      >
-                        Profile
-                      </Link>
-                      <Link
-                        href="/orders"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                      >
-                        Orders
-                      </Link>
-                      <Link
-                        href="/wishlist"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                      >
-                        Wishlist
-                      </Link>
-                      <button
-                        onClick={handleLogout}
-                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                      >
-                        Logout
-                      </button>
-                    </div>
+                    <Download className="h-4 w-4 mr-2" />
+                    Download Report
+                  </Button>
+                  <div className="relative group">
+                    <Link
+                      href="/profile"
+                      className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <UserAvatar name={user?.name || "User"} email={user?.email} size="md" />
+                    </Link>
                   </div>
                 </div>
               ) : (
                 <div className="flex items-center space-x-3">
+                  <Button
+                    onClick={handleDownloadReport}
+                    variant="outline"
+                    size="sm"
+                    className="rounded-xl border-gray-300 hover:bg-gray-50 transition-all"
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Download Report
+                  </Button>
                   <Link href="/auth/login">
                     <Button variant="ghost" size="sm" className="rounded-xl">
                       Login
@@ -402,6 +436,16 @@ export default function Header() {
                         <p className="text-sm text-gray-500">{user?.email}</p>
                       </div>
                     </div>
+                    <button
+                      onClick={() => {
+                        handleDownloadReport()
+                        closeMenu()
+                      }}
+                      className="flex items-center space-x-2 text-gray-700 hover:text-primary transition-colors"
+                    >
+                      <Download className="h-4 w-4" />
+                      <span>Download Report</span>
+                    </button>
                     <Link
                       href="/profile"
                       className="block text-gray-700 hover:text-primary transition-colors"
@@ -435,6 +479,16 @@ export default function Header() {
                   </div>
                 ) : (
                   <div className="pt-4 border-t border-gray-200 space-y-3">
+                    <button
+                      onClick={() => {
+                        handleDownloadReport()
+                        closeMenu()
+                      }}
+                      className="flex items-center space-x-2 text-gray-700 hover:text-primary transition-colors"
+                    >
+                      <Download className="h-4 w-4" />
+                      <span>Download Report</span>
+                    </button>
                     <Link href="/auth/login" onClick={closeMenu}>
                       <Button variant="ghost" className="w-full justify-start rounded-xl">
                         Login
