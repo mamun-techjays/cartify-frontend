@@ -100,10 +100,11 @@ const products = [
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id)
+    const { id: idParam } = await params
+    const id = parseInt(idParam)
     const product = products.find(p => p.id === id)
 
     if (!product) {

@@ -19,10 +19,20 @@ class ApiService {
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
     const url = `${this.baseURL}${endpoint}`
 
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       "Content-Type": "application/json",
       Accept: "application/json",
-      ...options.headers,
+    }
+
+    // Handle options.headers properly
+    if (options.headers) {
+      if (options.headers instanceof Headers) {
+        options.headers.forEach((value, key) => {
+          headers[key] = value
+        })
+      } else if (typeof options.headers === 'object') {
+        Object.assign(headers, options.headers)
+      }
     }
 
     if (this.authToken) {
@@ -72,7 +82,7 @@ class ApiService {
 
         // Provide fallback for auth endpoints (always available, not just in development)
         if (endpoint.includes("/api/auth/")) {
-          return this.handleAuthFallback<T>(endpoint, options.body)
+          return this.handleAuthFallback<T>(endpoint, options.body || undefined)
         }
 
         // Provide fallback for common endpoints

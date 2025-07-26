@@ -85,7 +85,7 @@ export default function SearchAutocomplete() {
       try {
         // Try to fetch from API
         const response = await apiService.get(`/search/suggestions?q=${encodeURIComponent(query)}`)
-        setSuggestions(response.data || [])
+        setSuggestions(Array.isArray(response.data) ? response.data : [])
       } catch (error) {
         // Fallback to mock suggestions
         const filtered = mockSuggestions.filter((suggestion) =>
